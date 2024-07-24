@@ -81,6 +81,7 @@ target/
 # ipython/jupyter notebooks
 # *.ipynb
 **/.ipynb_checkpoints/
+rnn-lstm-gru-2.ipynb
 
 # IPython
 profile_default/
