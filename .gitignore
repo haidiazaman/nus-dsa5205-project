@@ -175,7 +175,6 @@ poetry.toml
 pyrightconfig.json
 
 # project directories
-/data/*
 **/.DS_Store
 
 # pytorch/python/numpy formats
