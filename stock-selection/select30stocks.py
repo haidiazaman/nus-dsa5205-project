@@ -87,14 +87,14 @@ def score_stock(ticker, market, end_date, days_back=60, allow_short=False):
             total_score = (volatility_score * 0.4 +    # higher vol as it provides profit opp in both directions
                         liquidity_score * 0.1 +        # liquid positions to enter and exit
                         np.abs(momentum_score) * 0.1 +
-                        np.abs(return_score) * 0.3)     # abs(return) to see if the market moves
+                        np.abs(return_score) * 0.4)     # abs(return) to see if the market moves
 
         else:
             total_score = (return_score * 0.3 +         # more weight to higher returns
                         volatility_score * 0.35 + 
-                        liquidity_score * 0.15 +        # liquid positions to enter and exit
+                        liquidity_score * 0.1 +        # liquid positions to enter and exit
                         momentum_score * 0.1 +
-                        sharpe_score * 0.1)             # risk adjusted returns
+                        sharpe_score * 0.15)             # risk adjusted returns
         return total_score
     
     except Exception as e:
