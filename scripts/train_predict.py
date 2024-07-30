@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPRegressor
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.feature_selection import SelectKBest, f_regression
 
 
@@ -24,4 +24,8 @@ def train_val_test_split(X, y, train_size, val_size, test_size):
     
     return X_train,y_train,X_val,y_val,X_test,y_test
 
-{'activation': 'tanh', 'alpha': 0.001, 'hidden_layer_sizes': (8, 64), 'learning_rate': 'constant', 'solver': 'adam'}
+def shuffle_train_val_test_split(X, y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
+    
+    return X_train,y_train,X_val,y_val,X_test,y_test
