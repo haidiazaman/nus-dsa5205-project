@@ -6,7 +6,7 @@ from pytz import timezone
 # Change stocks and dates here
 stocks = ['NVDA', 'SMCI', 'DASH'] 
 start_date = '2023-01-03'
-end_date = '2023-06-30'   
+end_date = '2023-12-31'   
 
 def generate_portfolio_data(stocks, start_date, end_date):
     """
