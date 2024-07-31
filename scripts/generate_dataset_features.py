@@ -130,7 +130,9 @@ def generate_features(df,trading_days_per_year = 252, hours_per_day = 6.5):
 def categorize_by_percentile(values):
     # Compute percentiles
     # percentiles = np.percentile(values, [20, 40, 60, 80])
-    percentiles = np.percentile(values, [33,66])
+    # percentiles = np.percentile(values, [33,66])
+    percentiles = np.percentile(values, [20,80])
+    # percentiles = np.percentile(values, [10,90])
     
     # Define labels
     # labels = ['strong sell', 'sell', 'hold', 'buy', 'strong buy']
