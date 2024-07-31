@@ -129,10 +129,12 @@ def generate_features(df,trading_days_per_year = 252, hours_per_day = 6.5):
 
 def categorize_by_percentile(values):
     # Compute percentiles
-    percentiles = np.percentile(values, [20, 40, 60, 80])
+    # percentiles = np.percentile(values, [20, 40, 60, 80])
+    percentiles = np.percentile(values, [33,66])
     
     # Define labels
-    labels = ['strong sell', 'sell', 'hold', 'buy', 'strong buy']
+    # labels = ['strong sell', 'sell', 'hold', 'buy', 'strong buy']
+    labels = ['sell', 'hold', 'buy']
 
     # Use pd.cut to bin the values
     categories = pd.cut(values, bins=[-np.inf] + percentiles.tolist() + [np.inf], labels=labels, include_lowest=True)
@@ -140,7 +142,7 @@ def categorize_by_percentile(values):
     # could potentially have issue where 
     
     return categories
-
+ 
 
 def get_one_stock_features_df(stock_name,start_date,end_date,interval,trading_days_per_year, hours_per_day):
     """
@@ -152,11 +154,9 @@ def get_one_stock_features_df(stock_name,start_date,end_date,interval,trading_da
     stock_df["Stock_Position"] = categorize_by_percentile(stock_df["Log_Return_shift"].to_numpy())
     
     label_mapping = {
-        'strong sell': 0, 
-        'sell': 1, 
-        'hold': 2, 
-        'buy': 3, 
-        'strong buy': 4
+        'sell': 0, 
+        'hold': 1, 
+        'buy': 2, 
     }
     
     stock_df["Target"] = stock_df["Stock_Position"].apply(lambda x:label_mapping[x])
