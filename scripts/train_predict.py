@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from alive_progress import alive_it
 
@@ -8,7 +8,7 @@ from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA, KernelPCA
 from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPRegressor
+from sklearn.neural_network import MLPRegressor, MLPClassifier
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.feature_selection import SelectKBest, f_regression
 
@@ -29,3 +29,5 @@ def shuffle_train_val_test_split(X, y):
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
     
     return X_train,y_train,X_val,y_val,X_test,y_test
+
+
