@@ -3,10 +3,13 @@ import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
 from calculate_pnl import generate_portfolio_data, fetch_price_data, calculate_portfolio_value_and_pnl, stocks, start_date, end_date
+from trading_days import calculate_trading_days
+from rf_rate import calculate_mean_rf_rate
 
-rf_rate = 0.04
-trading_days = 252
+risk_free_rate = calculate_mean_rf_rate(start_date, end_date)
+trading_days = calculate_trading_days(start_date, end_date)
 trading_hours = 6.5
+
 
 def fetch_snp500_data(start_date, end_date, portfolio_index):
     """Fetch S&P 500 data and align it with portfolio dates"""
@@ -15,7 +18,7 @@ def fetch_snp500_data(start_date, end_date, portfolio_index):
     snp500_data.index = snp500_data.index.tz_convert('America/New_York')
     return snp500_data['Close'].reindex(portfolio_index, method='ffill')
 
-def calculate_ratios(portfolio_values, benchmark_values, risk_free_rate=rf_rate):
+def calculate_ratios(portfolio_values, benchmark_values):
     portfolio_returns = portfolio_values.pct_change().dropna()
     benchmark_returns = benchmark_values.pct_change().dropna()
     
