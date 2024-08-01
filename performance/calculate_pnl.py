@@ -4,9 +4,9 @@ import yfinance as yf
 from pytz import timezone
 
 # Change stocks and dates here
-stocks = ['NVDA', 'SMCI', 'DASH'] 
+stocks = ['NVDA']
 start_date = '2023-01-03'
-end_date = '2023-12-31'   
+end_date = '2023-01-04'   
 
 def generate_portfolio_data(stocks, start_date, end_date):
     """
@@ -67,32 +67,37 @@ def fetch_price_data(stocks, portfolio_dates):
     return df
 
 def calculate_portfolio_value_and_pnl(portfolio, prices):
+    # portfolio_values = pd.Series(index=portfolio.index, dtype=float)
+    port_len = len(portfolio.columns)
     portfolio_values = pd.Series(index=portfolio.index, dtype=float)
     pnl = pd.Series(index=portfolio.index, dtype=float)
-    
-    # $1 investment
-    current_value = 1.0
+    positions = [[] for _ in range(len(portfolio))]
+    # $100,000 investment
+    current_value = 100000.0
     
     for i in range(len(portfolio)):
+        weights = list(portfolio.iloc[i])
+        current_prices = list(prices.iloc[i])
+        current_value = sum([a*b for a,b in zip(positions[i-1][1],prices.iloc[i])]) \
+                + sum([a*b for a,b in zip(positions[i-1][0],prices.iloc[i])]) if i!=0 else current_value
+        long_position = [x * current_value / p if x>0 else 0 for x,p in zip(weights, current_prices)] 
+        short_position = [-x * current_value / p if x<0 else 0 for x,p in zip(weights, current_prices)] 
+        positions[i] = [long_position, short_position]
         if i == 0:
             # Initial investment
-            portfolio_values[i] = current_value
+            portfolio_values[i] = current_value 
             pnl[i] = 0
         else:
-            # Sell previous portfolio
-            current_value = sum(previous_shares * prices.iloc[i])
-            
+            # value of long/short position
+            long_value = sum([a*b for a,b in zip(long_position, prices.iloc[i])])
+            short_value = sum([a*b for a,b in zip(short_position, prices.iloc[i])])
+
             # Calculate profit/loss
-            pnl[i] = current_value - portfolio_values[i-1]
-            
-            # Record new portfolio value
-            portfolio_values[i] = current_value
-        
-        # Buy new portfolio
-        weights = portfolio.iloc[i]
-        current_prices = prices.iloc[i]
-        previous_shares = weights * current_value / current_prices
-    
+            pnl[i] = 0
+            pnl[i] += sum([a*b for a,b in zip(positions[i-1][1],prices.iloc[i-1])]) - short_value
+            pnl[i] += long_value - sum([a*b for a,b in zip(positions[i-1][0],prices.iloc[i-1])])
+            portfolio_values[i] = long_value + short_value
+
     return portfolio_values, pnl
 
 portfolio = generate_portfolio_data(stocks, start_date, end_date)
@@ -103,9 +108,9 @@ cumulative_pnl = pnl.cumsum()
 print("\nPortfolio Weights ($):")
 print(portfolio.head())
 print("\nFetched Prices (first 5 rows):")
-print(prices.head())
+print(prices)
 print("\nPortfolio Values (first 5 rows):")
-print(portfolio_values.head())
+print(portfolio_values)
 print("\nHourly P/L (first 5 rows):")
 print(pnl.head())
 print("\nCumulative P/L (first 5 rows):")
