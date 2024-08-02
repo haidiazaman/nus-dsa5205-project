@@ -134,8 +134,8 @@ def generate_top_stocks_df():
     # for i, stock in enumerate(top_stocks_long_short, 1):
     #     print(f"{i}. {stock}")
     
-    pd.DataFrame({'Rank': range(1, 31), 'Ticker': top_stocks_long}).to_csv('stock-selection/top_30_stocks_long_only.csv', index=False)
-    pd.DataFrame({'Rank': range(1, 31), 'Ticker': top_stocks_long_short}).to_csv('stock-selection/top_30_stocks_long_short.csv', index=False)
+    pd.DataFrame({'Rank': range(1, 31), 'Ticker': top_stocks_long}).to_csv('/Users/bryanwong/Projects/nus-dsa5205-project/stock_selection/top_30_stocks_long_only.csv', index=False)
+    pd.DataFrame({'Rank': range(1, 31), 'Ticker': top_stocks_long_short}).to_csv('/Users/bryanwong/Projects/nus-dsa5205-project/stock_selection/top_30_stocks_long_short.csv', index=False)
     
     print("\nResults saved to 'top_30_stocks_long_only.csv' and 'top_30_stocks_long_short.csv'")
     
