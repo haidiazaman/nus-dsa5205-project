@@ -2,11 +2,13 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from pytz import timezone
+import argparse
 
 # Change stocks and dates here
-stocks = ['NVDA']
-start_date = '2023-01-03'
-end_date = '2023-01-04'   
+# stocks = ['NVDA']
+start_date = '2024-07-01'
+end_date = '2024-07-31'   
+
 
 def generate_portfolio_data(stocks, start_date, end_date):
     """
@@ -48,6 +50,7 @@ def generate_portfolio_data(stocks, start_date, end_date):
     
     return df
 
+
 def fetch_price_data(stocks, portfolio_dates):
     price_data = {}
     for stock in stocks:
@@ -66,14 +69,14 @@ def fetch_price_data(stocks, portfolio_dates):
     df = pd.DataFrame(price_data)
     return df
 
+
 def calculate_portfolio_value_and_pnl(portfolio, prices):
-    # portfolio_values = pd.Series(index=portfolio.index, dtype=float)
     port_len = len(portfolio.columns)
     portfolio_values = pd.Series(index=portfolio.index, dtype=float)
     pnl = pd.Series(index=portfolio.index, dtype=float)
     positions = [[] for _ in range(len(portfolio))]
-    # $100,000 investment
-    current_value = 100000.0
+    # $100 investment
+    current_value = 100.0
     
     for i in range(len(portfolio)):
         weights = list(portfolio.iloc[i])
@@ -91,28 +94,43 @@ def calculate_portfolio_value_and_pnl(portfolio, prices):
             # value of long/short position
             long_value = sum([a*b for a,b in zip(long_position, prices.iloc[i])])
             short_value = sum([a*b for a,b in zip(short_position, prices.iloc[i])])
-
             # Calculate profit/loss
-            pnl[i] = 0
-            pnl[i] += sum([a*b for a,b in zip(positions[i-1][1],prices.iloc[i-1])]) - short_value
-            pnl[i] += long_value - sum([a*b for a,b in zip(positions[i-1][0],prices.iloc[i-1])])
             portfolio_values[i] = long_value + short_value
-
+            pnl[i] = portfolio_values[i] - portfolio_values[i-1]
     return portfolio_values, pnl
 
-portfolio = generate_portfolio_data(stocks, start_date, end_date)
-prices = fetch_price_data(stocks, portfolio.index)
-portfolio_values, pnl = calculate_portfolio_value_and_pnl(portfolio, prices)
-cumulative_pnl = pnl.cumsum()
 
-print("\nPortfolio Weights ($):")
-print(portfolio.head())
-print("\nFetched Prices (first 5 rows):")
-print(prices)
-print("\nPortfolio Values (first 5 rows):")
-print(portfolio_values)
-print("\nHourly P/L (first 5 rows):")
-print(pnl.head())
-print("\nCumulative P/L (first 5 rows):")
-print(cumulative_pnl.head())
-print(f"\nTotal P/L from {start_date} to {end_date}: ${cumulative_pnl.iloc[-1]:.2f}")
+def baseline(prices):
+    # start with $100
+    quantity = 10 * np.ones(len(prices.columns)) / prices.iloc[0]
+    final = sum(quantity * prices.iloc[-1])
+    return (final - 100)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', "--file", type=str)
+    args = vars(parser.parse_args())
+    portfolio = pd.read_csv(args['file'])
+    portfolio['Date'] = pd.to_datetime(portfolio['Date'])
+    portfolio = portfolio.set_index(['Date'])
+    print(portfolio.head())
+    stocks = list(portfolio.columns)
+    prices = fetch_price_data(stocks, portfolio.index)
+    portfolio_values, pnl = calculate_portfolio_value_and_pnl(portfolio, prices)
+    cumulative_pnl = pnl.cumsum()
+
+    print("\nPortfolio Weights ($):")
+    print(portfolio.head())
+    print("\nFetched Prices (first 5 rows):")
+    print(prices)
+    print("\nPortfolio Values (first 5 rows):")
+    print(portfolio_values)
+    print("\nHourly P/L (first 5 rows):")
+    print(pnl.head())
+    print("\nCumulative P/L (first 5 rows):")
+    print(cumulative_pnl.head())
+    print(f"\nTotal P/L: ${cumulative_pnl.iloc[-1]:.2f}")
+    print(f"Baseline P/L: ${baseline(prices):.2f}")
+
+main()
