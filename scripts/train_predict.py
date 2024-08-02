@@ -50,7 +50,9 @@ def train(
     class_weights,
     criterion,
     train_loader,
-    val_loader
+    val_loader,
+    num_features,
+    num_classes
 ):
 
     if criterion=="cross":
@@ -59,7 +61,10 @@ def train(
         class_weights = torch.tensor(class_weights, device=device) # change to 1-%of that class
         criterion = FocalLoss(alpha=class_weights) 
 
-    model = FCN()
+    model = FCN(
+        num_features=num_features,
+        num_classes=num_classes
+    )
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=scheduler_factor, patience=scheduler_patience)
 
