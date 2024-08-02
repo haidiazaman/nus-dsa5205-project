@@ -2,10 +2,11 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from pytz import timezone
+import matplotlib.pyplot as plt
 import argparse
 
 # Change stocks and dates here
-# stocks = ['NVDA']
+stocks = ['^GSPC']
 start_date = '2024-07-01'
 end_date = '2024-07-31'   
 
@@ -35,9 +36,9 @@ def generate_portfolio_data(stocks, start_date, end_date):
     num_time_points = len(dates)
     num_stocks = len(stocks)
     base_weights = np.full((num_time_points, num_stocks), 1 / num_stocks)
-    noise = np.random.normal(0, 0.01, (num_time_points, num_stocks))
-    noise -= noise.mean(axis=1, keepdims=True)
-    weights = base_weights + noise
+    # noise = np.random.normal(0, 0.01, (num_time_points, num_stocks))
+    # noise -= noise.mean(axis=1, keepdims=True)
+    weights = base_weights
     weights = np.maximum(weights, 0)
     weights = weights / weights.sum(axis=1, keepdims=True)
     
@@ -101,8 +102,8 @@ def calculate_portfolio_value_and_pnl(portfolio, prices):
 
 
 def baseline(prices):
-    # start with $100
-    quantity = 10 * np.ones(len(prices.columns)) / prices.iloc[0]
+    # start with $100, equally split the into stocks
+    quantity = (100/len(prices.columns)) * np.ones(len(prices.columns)) / prices.iloc[0]
     final = sum(quantity * prices.iloc[-1])
     return (final - 100)
 
@@ -112,6 +113,12 @@ def main():
     parser.add_argument('-f', "--file", type=str)
     args = vars(parser.parse_args())
     portfolio = pd.read_csv(args['file'])
+
+    # stocks = ['^GSPC']
+    # start_date = '2024-01-01'
+    # end_date = '2024-07-31'   
+    # portfolio = generate_portfolio_data(stocks, start_date, end_date) # S&P port
+
     portfolio['Date'] = pd.to_datetime(portfolio['Date'])
     portfolio = portfolio.set_index(['Date'])
     print(portfolio.head())
@@ -120,17 +127,33 @@ def main():
     portfolio_values, pnl = calculate_portfolio_value_and_pnl(portfolio, prices)
     cumulative_pnl = pnl.cumsum()
 
+
+    # start_date = '2024-07-01'
+    # end_date = '2024-07-31'
+    base_port = generate_portfolio_data(stocks, start_date, end_date)
+    print(f"base_port {base_port}")
+    base_prices = fetch_price_data(stocks, base_port.index)
+    baseline_value, base_pnl = calculate_portfolio_value_and_pnl(base_port, base_prices)
+
     print("\nPortfolio Weights ($):")
     print(portfolio.head())
     print("\nFetched Prices (first 5 rows):")
     print(prices)
     print("\nPortfolio Values (first 5 rows):")
-    print(portfolio_values)
+    print(portfolio_values.head())
     print("\nHourly P/L (first 5 rows):")
     print(pnl.head())
     print("\nCumulative P/L (first 5 rows):")
     print(cumulative_pnl.head())
     print(f"\nTotal P/L: ${cumulative_pnl.iloc[-1]:.2f}")
-    print(f"Baseline P/L: ${baseline(prices):.2f}")
+    print(f"Baseline P/L: ${baseline(prices)}")
+    # print(f"Baseline P/L: ${base_pnl.cumsum().iloc[-1]}")
 
+    # plt.plot(baseline_value, label="Baseline")
+    # plt.plot(portfolio_values, label="Our Strategy")
+    # plt.legend()
+    # plt.xlabel('Date')
+    # plt.ylabel('Price in USD')
+    # plt.title('Strategy vs baseline')
+    # plt.show()
 main()
