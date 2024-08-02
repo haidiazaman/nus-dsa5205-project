@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore")
 
 stocks = ["DDOG", "SNPS", "BKNG", "SMCI", "MDB", "NVDA", "MELI", "WDAY", "MU", "PDD"]
 
-start_date = datetime(2024, 1, 1)
+start_date = datetime(2024, 7, 1)
 end_date = datetime(2024, 8, 1)
 lookback_period = 30
 rebalance_interval = 10
@@ -168,6 +168,76 @@ for label, result in markowitz_results.items():
     print(f"{label}: {cum_returns.iloc[-1]:.4f}")
 
 print("\nSharpe Ratios for Different Rebalancing Intervals:")
+for label, result in markowitz_results.items():
+    sharpe = (result['Returns'].mean() - rf_rate) / result['Returns'].std() * np.sqrt(252)
+    print(f"{label}: {sharpe:.4f}")
+
+def plot_stock_weightage(results):
+    fig = go.Figure()
+    for stock in results.columns[1:]:  # Skip the 'Returns' column
+        fig.add_trace(go.Scatter(
+            x=results.index,
+            y=results[stock],
+            mode='lines',
+            name=stock,
+            stackgroup='one'  # This creates a stacked area chart
+        ))
+    
+    fig.update_layout(
+        title='Portfolio Composition Over Time',
+        xaxis_title='Date',
+        yaxis_title='Weight',
+        yaxis_range=[0, 1],
+        legend_title='Stocks',
+        hovermode='x unified'
+    )
+    
+    fig.show()
+    fig.write_html("strategies/portfolio_composition.html")
+
+plot_stock_weightage(results_markowitz)
+
+def run_markowitz_multiple_parameters(data, lookback_periods, rebalance_intervals, start_date):
+    results = {}
+    for lookback in lookback_periods:
+        for interval in rebalance_intervals:
+            print(f"Running Markowitz strategy with lookback: {lookback}, rebalance interval: {interval}")
+            result = run_markowitz_strategy(data[stocks], lookback, interval, start_date)
+            results[f'Lookback: {lookback}, Interval: {interval}'] = result
+    return results
+
+# Define the parameters
+lookback_periods = [10, 30, 60]
+rebalance_intervals = [1, 10, 30]
+
+# Run the analysis
+markowitz_results = run_markowitz_multiple_parameters(data, lookback_periods, rebalance_intervals, start_date)
+
+# Plot the results
+def plot_markowitz_parameter_comparison(results):
+    fig = go.Figure()
+    
+    for label, result in results.items():
+        cum_returns = (1 + result['Returns'].fillna(0)).cumprod()
+        fig.add_trace(go.Scatter(x=cum_returns.index, y=cum_returns, mode='lines', name=label))
+    
+    fig.update_layout(title='Markowitz Strategy: Parameter Comparison',
+                      xaxis_title='Date',
+                      yaxis_title='Cumulative Returns',
+                      legend_title='Parameters')
+    
+    fig.show()
+    fig.write_html("strategies/markowitz_parameter_comparison.html")
+
+plot_markowitz_parameter_comparison(markowitz_results)
+
+# Print performance metrics
+print("\nFinal Cumulative Returns for Different Parameters:")
+for label, result in markowitz_results.items():
+    cum_returns = (1 + result['Returns'].fillna(0)).cumprod()
+    print(f"{label}: {cum_returns.iloc[-1]:.4f}")
+
+print("\nSharpe Ratios for Different Parameters:")
 for label, result in markowitz_results.items():
     sharpe = (result['Returns'].mean() - rf_rate) / result['Returns'].std() * np.sqrt(252)
     print(f"{label}: {sharpe:.4f}")
