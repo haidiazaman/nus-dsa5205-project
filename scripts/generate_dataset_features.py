@@ -23,14 +23,14 @@ def insert_ema_column(df, hours, column_to_ema, ema_column_name):
     for day in range(hours + 1, len(side_df)):
         side_df.loc[day, ema_column_name] = side_df.loc[day - 1, ema_column_name] * (1 - multiplier) + side_df.loc[day, column_to_ema] * multiplier
 
-    side_df[ema_column_name] = (side_df[column_to_ema] / side_df[ema_column_name] - 1).clip(-1, 1)
+    side_df[ema_column_name] = (side_df[column_to_ema] / side_df[ema_column_name] - 1)
     return side_df
 
 def insert_sma_column(df, hours, column_to_sma, sma_column_name):
     side_df = df.copy()
     side_df[sma_column_name] = side_df[column_to_sma].rolling(hours).mean()
 
-    side_df[sma_column_name] = (side_df[column_to_sma] / side_df[sma_column_name] - 1).clip(-1, 1)
+    side_df[sma_column_name] = (side_df[column_to_sma] / side_df[sma_column_name] - 1)
     
     return side_df
 
@@ -39,7 +39,7 @@ def insert_vwap_column(df, hours, vwap_column_name):
     side_df[vwap_column_name] = side_df['Close'] * side_df['Volume']
     side_df[vwap_column_name] = side_df[vwap_column_name].rolling(hours).sum() / side_df['Volume'].rolling(hours).sum()
 
-    side_df[vwap_column_name] = (side_df['Close'] / side_df[vwap_column_name] - 1).clip(-1, 1)
+    side_df[vwap_column_name] = (side_df['Close'] / side_df[vwap_column_name] - 1)
     
     return side_df
 
@@ -107,19 +107,19 @@ def generate_features(df,trading_days_per_year = 252, hours_per_day = 6.5):
         df[f'Volatility{hour}'] = df['Log_Return'].rolling(window=hour).std() * np.sqrt(hours_per_day * trading_days_per_year)
         
         # momentum from t-x hour
-        df[f'Momentum{hour}'] = (df['Close'] / df['Close'].shift(hour)).clip(-1, 1)
+        df[f'Momentum{hour}'] = (df['Close'] / df['Close'].shift(hour))
     
-    df['PriceVolatilityHourly'] = ((df['High'] - df['Low']) - 1).clip(-1, 1)
+    df['PriceVolatilityHourly'] = ((df['High'] - df['Low']) - 1)
     
     ### brb fixing normalization
     for index, hour in enumerate(hours_gridsearch):
         if index <= 1:
             continue
     
-        longer = f'EMACloseDiff{hour}'
-        shorter = f'EMACloseDiff{hours_gridsearch[index - 1]}'
-        signal = f'EMACloseDiff{hours_gridsearch[index - 2]}'
-        df[f'MACD{hour}'] = (df[longer] - df[shorter]) / df[signal]
+        # longer = f'EMACloseDiff{hour}'
+        # shorter = f'EMACloseDiff{hours_gridsearch[index - 1]}'
+        # signal = f'EMACloseDiff{hours_gridsearch[index - 2]}'
+        # df[f'MACD{hour}'] = (df[longer] - df[shorter]) / df[signal]
     
     df = insert_fama_french_column(df)
     df["Log_Return_shift"] = df["Log_Return"].shift(-1)
