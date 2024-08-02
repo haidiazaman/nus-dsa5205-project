@@ -148,7 +148,7 @@ start_date = end_date - timedelta(days = days_back)
 
 data = prepare_data_for_ml(universe, markets, end_date, days_back)
 rf_model, le, feature_names = train_random_forest(data)
-top_30_stocks = [stock for stock in rank_stocks_rf(rf_model, data, le)[:31] if stock != 'ARM']
+top_30_stocks = [stock for stock in rank_stocks_rf(rf_model, data, le)[:31] if stock not in ('ARM')]
 
 print("Top 30 stocks:")
 print(top_30_stocks)

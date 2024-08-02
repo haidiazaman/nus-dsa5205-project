@@ -10,7 +10,6 @@ risk_free_rate = calculate_mean_rf_rate(start_date, end_date)
 trading_days = calculate_trading_days(start_date, end_date)
 trading_hours = 6.5
 
-
 def fetch_snp500_data(start_date, end_date, portfolio_index):
     """Fetch S&P 500 data and align it with portfolio dates"""
     snp500 = yf.Ticker("^GSPC")

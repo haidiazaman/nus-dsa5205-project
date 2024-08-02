@@ -159,7 +159,7 @@ fig1 = plot_stock_correlation(prices.pct_change().dropna())
 fig2 = plot_market_cap_treemap(tickers, market_cap_start_date, market_cap_end_date)
 fig3 = plot_risk_return_scatter(returns_risk)
 
-feature_importance = pd.read_csv('feature_importance.csv')
+feature_importance = pd.read_csv('stock_selection/feature_importance.csv')
 fig4 = plot_feature_importance(feature_importance)
 
 fig = make_subplots(rows=2, cols=2, specs=[[{'type': 'xy'}, {'type': 'xy'}],
