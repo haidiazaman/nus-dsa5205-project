@@ -110,6 +110,9 @@ def prepare_data_for_ml(universe, markets, end_date, days_back):
 
     return pd.DataFrame(data)
 
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import numpy as np
+
 def train_random_forest(data):
     le = LabelEncoder()
     data['market_encoded'] = le.fit_transform(data['market'])
@@ -117,18 +120,37 @@ def train_random_forest(data):
     numerical_columns = ['market_encoded'] + [col for col in data.columns if col.startswith(('momentum_', 'liquidity_', 'sharpe_', 'volatility_'))]
     X = data[numerical_columns]
     y = data['future_return']
-    X = data[numerical_columns]
-    y = data['future_return']
 
     split_point = int(len(data) * 0.8)
-    X_train = X.iloc[:split_point]
-    y_train = y.iloc[:split_point]
-    X_test = X.iloc[split_point:]
-    y_test = y.iloc[split_point:]
+    X_train, X_test = X.iloc[:split_point], X.iloc[split_point:]
+    y_train, y_test = y.iloc[:split_point], y.iloc[split_point:]
 
     rf = RandomForestRegressor(n_estimators=100, random_state=42)
     rf.fit(X_train, y_train)
-    return rf, le, numerical_columns
+    
+    # Performance measurement
+    train_predictions = rf.predict(X_train)
+    test_predictions = rf.predict(X_test)
+    
+    train_mse = mean_squared_error(y_train, train_predictions)
+    test_mse = mean_squared_error(y_test, test_predictions)
+    train_rmse = np.sqrt(train_mse)
+    test_rmse = np.sqrt(test_mse)
+    train_mae = mean_absolute_error(y_train, train_predictions)
+    test_mae = mean_absolute_error(y_test, test_predictions)
+    train_r2 = r2_score(y_train, train_predictions)
+    test_r2 = r2_score(y_test, test_predictions)
+    
+    print("Random Forest Performance Metrics:")
+    print(f"Training RMSE: {train_rmse:.4f}")
+    print(f"Test RMSE: {test_rmse:.4f}")
+    print(f"Training MAE: {train_mae:.4f}")
+    print(f"Test MAE: {test_mae:.4f}")
+    print(f"Training R-squared: {train_r2:.4f}")
+    print(f"Test R-squared: {test_r2:.4f}")
+    
+    return rf, le, numerical_columns, (test_rmse, test_mae, test_r2)
+
 
 def rank_stocks_rf(rf_model, data, le):
     data['market_encoded'] = le.transform(data['market'])
@@ -147,7 +169,7 @@ end_date = datetime.strptime(end_date, "%Y-%m-%d")
 start_date = end_date - timedelta(days = days_back)  
 
 data = prepare_data_for_ml(universe, markets, end_date, days_back)
-rf_model, le, feature_names = train_random_forest(data)
+rf_model, le, feature_names, (test_rmse, test_mae, test_r2) = train_random_forest(data)
 top_30_stocks = [stock for stock in rank_stocks_rf(rf_model, data, le)[:31] if stock not in ('ARM')]
 
 print("Top 30 stocks:")
@@ -162,3 +184,4 @@ feature_importance = pd.DataFrame({
 print("\nFeature Importance:")
 print(feature_importance)
 feature_importance.to_csv('feature_importance.csv', index=False)
+
