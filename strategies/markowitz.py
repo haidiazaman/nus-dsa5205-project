@@ -158,7 +158,7 @@ def plot_markowitz_rebalancing_comparison(results):
     fig.show()
     fig.write_html("strategies/markowitz_rebalancing_comparison.html")
 
-rebalance_intervals = [1, 10, 30]
+rebalance_intervals = [5, 10, 15]
 markowitz_results = run_markowitz_multiple_intervals(data, lookback_period, rebalance_intervals, start_date)
 plot_markowitz_rebalancing_comparison(markowitz_results)
 
