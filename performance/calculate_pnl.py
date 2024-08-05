@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 import yfinance as yf
 from pytz import timezone
 import matplotlib.pyplot as plt
@@ -101,6 +102,15 @@ def calculate_portfolio_value_and_pnl(portfolio, prices):
     return portfolio_values, pnl
 
 
+def volatility(portfolio_values):
+    log_returns = np.log(np.array(portfolio_values[1:]) / np.array(portfolio_values[:-1]))
+    # print(portfolio_values.diff().dropna().std())
+    return log_returns.std() * math.sqrt(6.5 * 252)
+
+def sharpe_ratio(portfolio_values, rf_rate):
+     log_returns = np.log(np.array(portfolio_values[1:]) / np.array(portfolio_values[:-1]))
+     return (log_returns.mean()*6.5 * 252 - rf_rate) / volatility(portfolio_values)
+
 def baseline(prices):
     # start with $100, equally split the into stocks
     quantity = (100/len(prices.columns)) * np.ones(len(prices.columns)) / prices.iloc[0]
@@ -147,6 +157,11 @@ def main():
     print(cumulative_pnl.head())
     print(f"\nTotal P/L: ${cumulative_pnl.iloc[-1]:.2f}")
     print(f"Baseline P/L: ${baseline(prices)}")
+
+
+    print(f"Port vol: {volatility(portfolio_values)}")
+    # assume 5% rf rate
+    print(f"Sharpe: {sharpe_ratio(portfolio_values, 0.05)}")
     # print(f"Baseline P/L: ${base_pnl.cumsum().iloc[-1]}")
 
     # plt.plot(baseline_value, label="Baseline")
