@@ -1,5 +1,5 @@
 # nus-dsa5205-project
-this repo consolidates the codes and development work done for the NUS DSA5205, Data Science in Quantitative Finance module, completed in AY23/24 STII.
+This repo consolidates the codes and development work done for the NUS DSA5205, Data Science in Quantitative Finance module, completed in AY23/24 STII.
 
 * Research Objectives: Design an automated trading algorithm. It consists of stock selection, ML-based signal-generation and trade execution based on the signals. The final result can be used by retail traders who like to invest in the stock market but do not
 have time to follow the market closely. 
