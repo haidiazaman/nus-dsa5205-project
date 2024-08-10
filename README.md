@@ -7,13 +7,13 @@ have time to follow the market closely.
 * Approach Chosen: Choose the 10 stocks from the investment universe using random forest classifier; basic time series analysis on data; feature engineering based on on a grid of 72 features (derived from technical indicators such as VWAP and EMAs); train a fully connected neural network (FCN) to generate trading signals (long, neutral and short signals); rebalance the portfolio with equal-weight.
 
 * Stock Selection: Our stock universe comprised NASDAQ 100, FTSE 100, and 20 SGX stocks, balancing liquidity, diversification and returns.
-    * Applied PCA to the correlation matrix of daily returns (2022 - 2023), reducing dimensionality to two components explaining 72.94% of total variance. ![alt text]()
+    * Applied PCA to the correlation matrix of daily returns (2022 - 2023), reducing dimensionality to two components explaining 72.94% of total variance. ![alt text](https://github.com/haidiazaman/nus-dsa5205-project/blob/main/imgs/pca.png)
     *  Used K-means clustering to group stocks into 10 clusters based on PCA coordinates.
-    *  Selected the stock with the highest expected annualised return from each cluster. ![alt text]()
+    *  Selected the stock with the highest expected annualised return from each cluster. ![alt text](https://github.com/haidiazaman/nus-dsa5205-project/blob/main/imgs/stock_return.png)
 
 * Dataset Time Series Analysis
-    * The returns reveal stationarity (confirmed by ADF test), but ACF and PACF plots indicate no significant autocorrelation. This suggests that linear time series models like ARMA or ARCH are not suitable for modelling these returns or their volatility; advanced approaches are needed to model the potential non-linearity.![alt text]()
+    * The returns reveal stationarity (confirmed by ADF test), but ACF and PACF plots indicate no significant autocorrelation. This suggests that linear time series models like ARMA or ARCH are not suitable for modelling these returns or their volatility; advanced approaches are needed to model the potential non-linearity.![alt text](https://github.com/haidiazaman/nus-dsa5205-project/blob/main/imgs/ts_analysis.png)
 
 * Methods
-    * Markowitz Portfolio Optimisation ![alt text]()
-    * Fully-connected Neural Networks (FCN) ![alt text]() ![alt text]()
+    * Markowitz Portfolio Optimisation ![alt text](https://github.com/haidiazaman/nus-dsa5205-project/blob/main/imgs/markowitz.png)
+    * Fully-connected Neural Networks (FCN) ![alt text]() ![alt text](https://github.com/haidiazaman/nus-dsa5205-project/blob/main/imgs/fcn.png)
