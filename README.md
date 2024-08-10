@@ -19,4 +19,5 @@ have time to follow the market closely.
     * Fully-connected Neural Networks (FCN) ![alt text](https://github.com/haidiazaman/nus-dsa5205-project/blob/main/imgs/fcn.png)
 
 * Comparison of results
+  
 ![alt text](https://github.com/haidiazaman/nus-dsa5205-project/blob/main/imgs/comparison.png) 
